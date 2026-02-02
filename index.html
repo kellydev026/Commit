@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Valentine — Still Only You</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Great+Vibes&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0d0005;
+      --text: #f8e8ed;
+      --accent: #9c1a4a;
+      --accent-glow: #c6285c;
+      --deep-rose: #7d1139;
+      --gold: #d4a373;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.8;
+      overflow-x: hidden;
+    }
+
+    /* Overlay */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #1a0008, #300015);
+      color: #ffebee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      text-align: center;
+      transition: opacity 1.2s ease;
+    }
+
+    #overlay.hidden { opacity: 0; pointer-events: none; }
+
+    #overlay h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.5rem, 7.5vw, 4.8rem);
+      margin-bottom: 1.8rem;
+      text-shadow: 0 0 20px rgba(156,26,74,0.6);
+    }
+
+    #overlay #countdown {
+      font-size: 4.5rem;
+      font-weight: 700;
+      color: var(--accent-glow);
+      text-shadow: 0 0 25px rgba(198,40,92,0.7);
+    }
+
+    /* Main */
+    #main {
+      display: none;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 8rem;
+    }
+
+    .container {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 1.4s ease-out;
+    }
+
+    .container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    header {
+      text-align: center;
+      padding: 7rem 1rem 9rem;
+    }
+
+    h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(4.5rem, 11vw, 8.5rem);
+      color: var(--accent-glow);
+      line-height: 0.85;
+      margin-bottom: 1.2rem;
+      text-shadow: 0 0 30px rgba(198,40,92,0.5);
+    }
+
+    .subtitle {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.4rem;
+      color: #ffccd5;
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+      opacity: 0.95;
+    }
+
+    .days {
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin-top: 2rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+    }
+
+    section {
+      margin: 11rem 0;
+    }
+
+    h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 3.2rem;
+      color: var(--accent-glow);
+      text-align: center;
+      margin-bottom: 2.5rem;
+      text-shadow: 0 0 15px rgba(156,26,74,0.4);
+    }
+
+    .letter p {
+      font-size: 1.28rem;
+      max-width: 740px;
+      margin: 0 auto 2.2rem;
+      text-align: center;
+      opacity: 0.93;
+    }
+
+    .sweet {
+      color: #ff9ab5;
+      font-weight: 500;
+      font-style: italic;
+    }
+
+    .deep {
+      color: var(--accent-glow);
+      font-weight: 600;
+    }
+
+    /* Gallery */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2.2rem;
+      margin-top: 4rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(156,26,74,0.25);
+      background: rgba(20,0,10,0.6);
+      backdrop-filter: blur(6px);
+      transition: all 0.5s ease;
+      cursor: pointer;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-18px);
+      box-shadow: 0 20px 60px rgba(156,26,74,0.35);
+      border-color: var(--accent-glow);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 420px;
+      object-fit: cover;
+      transition: transform 0.9s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.12);
+    }
+
+    .caption {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      padding: 2rem 1.6rem;
+      background: linear-gradient(to top, rgba(12,0,6,0.95), transparent);
+      color: #ffebee;
+      transform: translateY(60%);
+      transition: all 0.5s ease;
+      opacity: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+    }
+
+    .gallery-item:hover .caption {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.96);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 2rem;
+    }
+
+    .lightbox img {
+      max-width: 94%;
+      max-height: 90vh;
+      border-radius: 18px;
+      border: 10px solid rgba(156,26,74,0.4);
+      box-shadow: 0 0 120px rgba(198,40,92,0.45);
+    }
+
+    /* Floating rose petals */
+    .petal {
+      position: fixed;
+      font-size: 1.8rem;
+      pointer-events: none;
+      animation: drift 14s linear infinite;
+      z-index: 5;
+      opacity: 0.75;
+      color: #ff9ab5;
+      text-shadow: 0 0 12px rgba(198,40,92,0.6);
+    }
+
+    @keyframes drift {
+      0%   { transform: translateY(-15vh) translateX(-20vw) rotate(0deg); }
+      100% { transform: translateY(120vh) translateX(30vw) rotate(1080deg); }
+    }
+
+    /* Music button */
+    .music-btn {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 1.1rem 2rem;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(156,26,74,0.5);
+      transition: all 0.35s;
+      z-index: 100;
+    }
+
+    .music-btn:hover {
+      background: var(--accent-glow);
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(198,40,92,0.6);
+    }
+
+    /* Gift bouquet */
+    #gift {
+      position: fixed;
+      bottom: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 6rem;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 50;
+      animation: giftAppear 4s forwards 2s;
+      text-shadow: 0 0 40px rgba(198,40,92,0.7);
+    }
+
+    @keyframes giftAppear {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(80px) scale(0.3); }
+      40%  { opacity: 1; transform: translateX(-50%) translateY(-20px) scale(1.3); }
+      70%  { transform: translateX(-50%) translateY(10px) scale(0.95); }
+      100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    }
+
+    .footer {
+      text-align: center;
+      margin: 14rem 0 6rem;
+      font-family: 'Cinzel', serif;
+      color: var(--accent-glow);
+      font-size: 1.4rem;
+    }
+
+    .footer .name {
+      font-family: 'Great Vibes', cursive;
+      font-size: 3.5rem;
+      margin: 0.8rem 0 1rem;
+      color: #ff9ab5;
+    }
+  </style>
+</head>
+<body>
+
+<div id="overlay">
+  <h1>Is this really for me… forever? 🖤🌹</h1>
+  <div id="countdown">5</div>
+</div>
+
+<div id="main">
+
+  <audio id="bgMusic" loop>
+    <source src="memories.mp3" type="audio/mpeg">
+  </audio>
+  <button class="music-btn" onclick="toggleMusic()">♡ Play our song</button>
+
+  <!-- Virtual gift bouquet -->
+  <div id="gift">💐🌹💝</div>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" alt="Our memory">
+  </div>
+
+  <div class="container">
+    <header>
+      <h1>To My Only Valentine</h1>
+      <p class="subtitle" id="typedText"></p>
+      <div class="days" id="loveCounter"></div>
+    </header>
+  </div>
+
+  <div class="container">
+    <section>
+      <h2>My Heart’s Confession</h2>
+      <div class="letter">
+        <p>Even when the nights are long and quiet,</p>
+        <p>even when the world tries to pull us apart,</p>
+        <p>my soul still whispers your name like a prayer.</p>
+        <p style="margin: 3.5rem 0 2rem;">
+          <span class="deep">I don’t just love you.</span>
+        </p>
+        <p><span class="sweet">I ache for you.</span> In the sweetest, most dangerous way.</p>
+        <p>You are the only Valentine my heart will ever recognize.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="container">
+    <section>
+      <h2>Memories That Burn Inside Me</h2>
+      <div class="gallery">
+        <div class="gallery-item" onclick="openLightbox(this)">
+          <img src="images/pic1.jpg" alt="">
+          <div class="caption">The moment you ruined me for anyone else</div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)">
+          <img src="images/pic2.jpg" alt="">
+          <div class="caption">Where my heart learned your rhythm</div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)">
+          <img src="images/pic3.jpg" alt="">
+          <div class="caption">Your smile — my favorite addiction</div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)">
+          <img src="images/pic4.jpg" alt="">
+          <div class="caption">Still feels like the first time</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="container">
+    <section>
+      <h2>This Valentine’s Oath</h2>
+      <div class="letter" style="text-align:center; font-size:1.32rem;">
+        <p>I promise to burn for you — quietly, fiercely, endlessly.</p>
+        <p>I promise to choose you even when it hurts,</p>
+        <p>to want you even when the world says I shouldn’t,</p>
+        <p style="margin-top: 2.8rem; font-size: 1.45rem; font-style:italic; color: #ff9ab5;">
+          You are my forever Valentine.<br>
+          And I will never stop falling.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <div class="footer">
+    <p>Yours — in this life and whatever comes after</p>
+    <p class="name">Kelvin</p>
+    <p style="margin-top:2rem; font-size:1.2rem; opacity:0.85;">
+      Happy Valentine’s Day, my everything ♡🖤
+    </p>
+  </div>
+
+</div>
+
+<script>
+// Overlay countdown
+let count = 5;
+const overlay = document.getElementById("overlay");
+const countdownEl = document.getElementById("countdown");
+
+const timer = setInterval(() => {
+  count--;
+  countdownEl.innerText = count;
+  if (count <= 0) {
+    clearInterval(timer);
+    overlay.classList.add("hidden");
+    setTimeout(() => {
+      overlay.style.display = "none";
+      document.getElementById("main").style.display = "block";
+      initPage();
+    }, 1200);
+  }
+}, 1000);
+
+// ────────────────────────────────────────────────
+function initPage() {
+
+  // Typewriter
+  const text = "Because no one else will ever taste like home.";
+  let i = 0;
+  const typed = document.getElementById("typedText");
+  function type() {
+    if (i < text.length) {
+      typed.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(type, 70);
+    }
+  }
+  setTimeout(type, 900);
+
+  // Scroll reveal
+  const els = document.querySelectorAll(".container");
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add("visible");
+    });
+  }, { threshold: 0.14 });
+
+  els.forEach(el => observer.observe(el));
+
+  // Rose petals
+  function petal() {
+    const p = document.createElement("div");
+    p.className = "petal";
+    p.innerHTML = ["🌹","🖤","♡","💞","🌸"][Math.floor(Math.random()*5)];
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.fontSize = (1.6 + Math.random() * 2.2) + "rem";
+    p.style.animationDuration = (10 + Math.random() * 12) + "s";
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 26000);
+  }
+  setInterval(petal, 900);
+
+  // Music
+  const audio = document.getElementById("bgMusic");
+  let playing = false;
+  window.toggleMusic = () => {
+    if (!playing) {
+      audio.play().catch(()=>{});
+      playing = true;
+      document.querySelector(".music-btn").innerText = "♡ Pause our song";
+    } else {
+      audio.pause();
+      playing = false;
+      document.querySelector(".music-btn").innerText = "♡ Play our song";
+    }
+  };
+
+  // Days counter
+  const start = new Date("2024-01-01");
+  function updateDays() {
+    const days = Math.floor((new Date() - start) / (86400000));
+    document.getElementById("loveCounter").innerText =
+      `Loving you with every heartbeat for ${days} days — and this Valentine’s belongs to us ♡`;
+  }
+  updateDays();
+
+  // Lightbox
+  window.openLightbox = (el) => {
+    document.getElementById("lightboxImg").src = el.querySelector("img").src;
+    document.getElementById("lightbox").style.display = "flex";
+  };
+
+  window.closeLightbox = () => {
+    document.getElementById("lightbox").style.display = "none";
+  };
+}
+</script>
+</body>
+</html>
